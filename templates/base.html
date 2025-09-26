@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lost Item Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="{{ url_for('dashboard') }}" class="logo">Lost & Found Hub 📍</a>
+            <ul class="nav-links">
+                {% if session.email %}
+                    {% if session.role == 'admin' %}
+                         <li><a href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>Report a Lost Item</h2>
+</div>
+<div class="form-container">
+    <form action="{{ url_for('report_item') }}" method="POST">
+        <div class="form-grid">
+            <input type="text" name="itemName" placeholder="Item Name" required>
+            <input type="text" name="location" placeholder="General Location (e.g., City)" required>
+            <input type="text" name="identityMarks" placeholder="Identity Marks" required>
+            <input type="text" name="contactNumber" placeholder="Contact Number" required>
+            <input type="text" name="personalDetails" placeholder="Other Personal Details">
+            <input type="text" name="lostPlace" placeholder="Specific Lost Place (e.g., Park Bench)">
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="isElectrical" name="isElectrical">
+            <label for="isElectrical">Is this an electrical item? (Generates a Tracking ID)</label>
+        </div>
+        <button type="submit" class="btn">Report Item</button>
+    </form>
+</div>
+
+<hr class="separator">
+
+<div class="items-list">
+    <h2>Reported Lost Items</h2>
+    {% for item in items|reverse %}
+    <div class="item-card {% if item.status == 'found' %}status-found{% else %}status-not-found{% endif %}">
+        <div class="item-header">
+            <h3>{{ item.itemName }}</h3>
+            <span class="status-tag">{{ item.status.replace('_', ' ')|title }}</span>
+        </div>
+        <p><strong>Lost At:</strong> {{ item.lostPlace }}, {{ item.location }}</p>
+        {% if item.isElectrical and item.trackingId %}
+            <p><strong>Tracking ID:</strong> <span class="tracking-id">{{ item.trackingId }}</span></p>
+        {% endif %}
+        <a href="{{ url_for('item_details', item_id=item.id) }}" class="btn-details">View Details & Track</a>
+    </div>
+    {% else %}
+    <p>No items have been reported yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

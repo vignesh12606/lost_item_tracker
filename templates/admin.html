@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>Administrator Control Hub</h2>
+    <p>Manage all reported items below.</p>
+</div>
+
+<div class="items-list">
+    {% for item in items|reverse %}
+    <div class="item-card {% if item.status == 'found' %}status-found{% else %}status-not-found{% endif %}">
+        <div class="item-header">
+            <h3>{{ item.itemName }} (ID: {{ item.id }})</h3>
+            <span class="status-tag">{{ item.status.replace('_', ' ')|title }}</span>
+        </div>
+        <p><strong>Reported by:</strong> {{ item.reportedBy }}</p>
+        <p><strong>Lost At:</strong> {{ item.lostPlace }}, {{ item.location }}</p>
+        
+        <div class="admin-controls">
+            <form action="{{ url_for('update_status', item_id=item.id) }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn-admin-status">
+                    {% if item.status == 'found' %}Mark as Not Found{% else %}Mark as Found{% endif %}
+                </button>
+            </form>
+            <a href="{{ url_for('item_details', item_id=item.id) }}" class="btn-admin-location">Update Location & Details</a>
+        </div>
+    </div>
+    {% else %}
+    <p>No items have been reported yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

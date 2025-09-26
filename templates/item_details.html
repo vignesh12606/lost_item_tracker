@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Item Details - {{ item.itemName }}{% endblock %}
+
+{% block head %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+    #map { height: 400px; width: 100%; border-radius: 8px; margin-top: 20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="item-details-container">
+    <div class="item-card-full {% if item.status == 'found' %}status-found{% else %}status-not-found{% endif %}">
+        <h2>{{ item.itemName }} <span class="status-tag-details">{{ item.status.replace('_', ' ')|title }}</span></h2>
+        <p><strong>Reported By:</strong> {{ item.reportedBy }}</p>
+        <p><strong>Contact:</strong> {{ item.contactNumber }}</p>
+        <p><strong>Lost At:</strong> {{ item.lostPlace }}, {{ item.location }}</p>
+        <p><strong>Identifying Marks:</strong> {{ item.identityMarks }}</p>
+        <p><strong>Other Details:</strong> {{ item.personalDetails }}</p>
+        {% if item.isElectrical and item.trackingId %}
+            <p><strong>Tracking ID:</strong> <span class="tracking-id">{{ item.trackingId }}</span></p>
+        {% endif %}
+    </div>
+
+    <h3>📍 Live Location Tracker</h3>
+    {% if item.currentLocation %}
+        <div id="map"></div>
+    {% else %}
+        <p>Location has not been updated by the administrator yet.</p>
+    {% endif %}
+
+    {% if user_role == 'admin' %}
+    <div class="admin-actions">
+        <h4>Update Item Location (Admin)</h4>
+        <form action="{{ url_for('update_location', item_id=item.id) }}" method="POST">
+            <input type="text" name="latitude" placeholder="Latitude (e.g., 12.8231)" required>
+            <input type="text" name="longitude" placeholder="Longitude (e.g., 80.0443)" required>
+            <button type="submit" class="btn">Update Location</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="comments-section">
+        <h3>Comments</h3>
+        <form action="{{ url_for('item_details', item_id=item.id) }}" method="POST">
+            <textarea name="comment" placeholder="Add a helpful comment..." required></textarea>
+            <button type="submit" class="btn">Add Comment</button>
+        </form>
+        <div class="comments-list">
+            {% for comment in comments %}
+                <div class="comment">
+                    <p>{{ comment.commentText }}</p>
+                    <small>by: {{ comment.commenterEmail }}</small>
+                </div>
+            {% else %}
+                <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if item.currentLocation %}
+<script>
+    const itemId = {{ item.id }};
+    const initialLat = {{ item.currentLocation.lat }};
+    const initialLng = {{ item.currentLocation.lng }};
+
+    // Initialize map
+    const map = L.map('map').setView([initialLat, initialLng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+    
+    // Add initial marker
+    let marker = L.marker([initialLat, initialLng]).addTo(map)
+        .bindPopup('<b>{{ item.itemName }}</b><br>Current reported location.')
+        .openPopup();
+
+    // Function to fetch and update location
+    async function updateLocation() {
+        try {
+            const response = await fetch(`/get_item_location/${itemId}`);
+            const newLocation = await response.json();
+            
+            if (newLocation && (newLocation.lat !== marker.getLatLng().lat || newLocation.lng !== marker.getLatLng().lng)) {
+                console.log('Location updated:', newLocation);
+                const newLatLng = [newLocation.lat, newLocation.lng];
+                marker.setLatLng(newLatLng);
+                map.panTo(newLatLng);
+            }
+        } catch (error) {
+            console.error('Error fetching location:', error);
+        }
+    }
+
+    // Poll for updates every 5 seconds
+    setInterval(updateLocation, 5000); 
+</script>
+{% endif %}
+
+{% endblock %}

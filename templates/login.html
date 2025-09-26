@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Login / Register{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="form-box">
+        <div id="login-form">
+            <h2>User / Admin Login</h2>
+            {% if error %}<p class="error">{{ error }}</p>{% endif %}
+            <form action="{{ url_for('login') }}" method="POST">
+                <input type="hidden" name="form_type" value="login">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <p class="toggle-link">Don't have an account? <a href="#" onclick="toggleForms()">Register here</a></p>
+        </div>
+
+        <div id="register-form" style="display: none;">
+            <h2>Create an Account</h2>
+            <form action="{{ url_for('login') }}" method="POST">
+                <input type="hidden" name="form_type" value="register">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p class="toggle-link">Already have an account? <a href="#" onclick="toggleForms()">Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleForms() {
+        var loginForm = document.getElementById('login-form');
+        var registerForm = document.getElementById('register-form');
+        if (loginForm.style.display === 'none') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+    }
+</script>
+{% endblock %}

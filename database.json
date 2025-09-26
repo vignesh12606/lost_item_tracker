@@ -1,0 +1,34 @@
+{
+  "users": [
+    {
+      "email": "admin@example.com",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "email": "user@example.com",
+      "password": "123",
+      "role": "user"
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "itemName": "Iphone 17 pro max",
+      "location": "Vandalur",
+      "identityMarks": "Orange Colour & Brand New",
+      "contactNumber": "9876543210",
+      "personalDetails": "It very Personal to Me",
+      "lostPlace": "VIT Chennai",
+      "isElectrical": true,
+      "trackingId": "TRK-70B95E72",
+      "status": "not_found",
+      "reportedBy": "user@example.com",
+      "currentLocation": {
+        "lat": 12.8231,
+        "lng": 80.04432
+      }
+    }
+  ],
+  "comments": []
+}
